@@ -2,21 +2,31 @@ import math
 import bpy
 import bmesh
 
+#math constants
+pi = math.pi
+sin = math.sin
+cos = math.cos
+
+period = 2*pi
+
+#Update t based on frame rate
+fps = bpy.context.scene.render.fps
+delta = ((2*pi)/fps)
+
+def calc_x(t):
+    return 2 * cos(t) + 3 * sin(4 * t)
+
+def calc_y(t):
+    return 3 * sin(t) + 2 * cos(4 * t)
+
+
+
 print("-------------------------------------------------------------")
 
-#Create cube to serve as shape object
-shape = bpy.ops.mesh.primitive_cube_add(name="shape");
+#Create cube to serve as shape object and immediately enter edit mode
+shape = bpy.ops.mesh.primitive_cube_add(enter_editmode=True);
 
-#Select the object
-bpy.context.collection.objects.link(shape)
-shape.select_set(True)
-
-#Switch to edit mode
-if bpy.context.mode != "EDIT_MESH" and bpy.ops.object.mode_set.poll():
-    bpy.ops.object.mode_set(mode="EDIT");
-
-#Delete all vertices except one    
-
+#Delete all vertices except one
 bpy.ops.mesh.select_all(action='DESELECT')
 bpy.ops.mesh.select_random(ratio=0.875)
 bpy.ops.mesh.delete()
@@ -35,29 +45,22 @@ v_coords -= v_coords
 obj_data.update()
 bm.verts.ensure_lookup_table()
 
-#math constants
-pi = math.pi
-sin = math.sin
-cos = math.cos
+escape = 0
+t = 0
 
-def calc_x(t):
-    return 2 * cos(t) + 3 * sin(4 * t)
-
-def calc_y(t):
-    return 3 * sin(t) + 2 * cos(4 * t)
-
-#Update t based on render frame rate
-fps = bpy.context.scene.render.fps
-delta = pi/fps
-
-for t in range(0, 100):
+while t < period:
     x = calc_x(t)
     y = calc_y(t)
     
-    vertex.co = [x,y,0]
+    #vertex.co = [x,y,0]
     print("vertex", vertex.co)
     
     t += delta
     
-    if(t >= 2*pi):
+    ++escape
+    
+    if(escape >= 420):
+        print('escaped')
         break
+
+print('done')
