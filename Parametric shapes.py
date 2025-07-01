@@ -4,12 +4,10 @@ import bmesh
 
 print("-------------------------------------------------------------")
 
+#Create cube to serve as shape object
+shape = bpy.ops.mesh.primitive_cube_add(name="shape");
 
-#Create new object with mesh
-mesh = bpy.data.meshes.new(name="shape");
-shape = bpy.data.objects.new("shape", mesh);
-
-#Select the new object
+#Select the object
 bpy.context.collection.objects.link(shape)
 shape.select_set(True)
 
@@ -18,7 +16,7 @@ if bpy.context.mode != "EDIT_MESH" and bpy.ops.object.mode_set.poll():
     bpy.ops.object.mode_set(mode="EDIT");
 
 #Delete all vertices except one    
-bpy.ops.mesh.primitive_cube_add();
+
 bpy.ops.mesh.select_all(action='DESELECT')
 bpy.ops.mesh.select_random(ratio=0.875)
 bpy.ops.mesh.delete()
