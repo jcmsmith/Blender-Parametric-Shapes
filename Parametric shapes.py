@@ -53,7 +53,6 @@ bpy.ops.mesh.delete()
 #Create bmesh to access and manipulate vertex properties
 obj_data = bpy.context.object.data
 bm = bmesh.from_edit_mesh(obj_data)
-bm.verts.ensure_lookup_table()
 
 points = calculate_points();
 previous = []
@@ -61,14 +60,13 @@ previous = []
 for point in points:
     newvert = bm.verts.new(point)
     
-    if not previous:
-        previous = newvert
-        continue;
+    if previous:
+        bmesh.ops.contextual_create(bm, geom=[newvert, previous])
+        
+    bm.verts.ensure_lookup_table()
+    bm.verts.index_update()
     
-    bmesh.ops.connect_vert_pair(bm, verts=[newvert, previous])
     previous = newvert;
     
 #Update mesh data
 obj_data.update()
-bm.verts.ensure_lookup_table()
-
