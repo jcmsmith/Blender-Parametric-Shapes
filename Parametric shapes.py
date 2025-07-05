@@ -41,23 +41,19 @@ def calculate_points(period = 2*pi):
 
 print("-------------------------------------------------------------")
 
-#Create cube to serve as shape object and immediately enter edit mode
+#Create object, enter edit mode & delete existing vertices
 shape = bpy.ops.mesh.primitive_cube_add(enter_editmode=True);
-
-#Delete all vertices except one
-bpy.ops.mesh.select_all(action='DESELECT')
-bpy.ops.mesh.select_random(ratio=0.875)
+bpy.ops.mesh.select_all(action='SELECT')
 bpy.ops.mesh.delete()
 
-#Create bmesh to access vertex data
+#Create bmesh to access and manipulate vertex properties
 obj_data = bpy.context.object.data
 bm = bmesh.from_edit_mesh(obj_data)
 bm.verts.ensure_lookup_table()
-vertex = bm.verts[0]
 
-#Move while maintaining offset
-v_coords = vertex.co.copy()
-v_coords -= v_coords
+points = calculate_points();
+for point in points:
+    print("point", point)
     
 #Update mesh data
 obj_data.update()
