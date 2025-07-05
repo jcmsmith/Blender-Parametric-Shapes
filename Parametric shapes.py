@@ -19,6 +19,24 @@ def calc_x(t):
 def calc_y(t):
     return 3 * sin(t) + 2 * cos(4 * t)
 
+def calculate_points(period = 2*pi):
+    escape = 0
+    t = 0
+    vertices = []
+
+    while t < period:
+        if(escape >= 420):
+            print('oops, escaped')
+            break;
+        
+        x = calc_x(t)
+        y = calc_y(t)
+        
+        vertices.append([x,y,0])
+        t += delta;
+        
+        escape += 1;
+    return vertices;
 
 
 print("-------------------------------------------------------------")
@@ -37,7 +55,7 @@ bm = bmesh.from_edit_mesh(obj_data)
 bm.verts.ensure_lookup_table()
 vertex = bm.verts[0]
 
-#Subtract the coordinates of the original point from its current point to move while maintaining offset - probably unnecessary here we're just trying to move it to the origin
+#Move while maintaining offset
 v_coords = vertex.co.copy()
 v_coords -= v_coords
     
@@ -45,22 +63,3 @@ v_coords -= v_coords
 obj_data.update()
 bm.verts.ensure_lookup_table()
 
-escape = 0
-t = 0
-vertices = []
-
-while t < period:
-    
-    if(escape >= 420):
-        print('oops, escaped')
-        break;
-    
-    x = calc_x(t)
-    y = calc_y(t)
-    
-    vertices.append([x,y,0])
-    t += delta;
-    
-    escape += 1;
-    
-print(vertices)
