@@ -47,20 +47,20 @@ bm.verts.ensure_lookup_table()
 
 escape = 0
 t = 0
+vertices = []
 
 while t < period:
+    
+    if(escape >= 420):
+        print('oops, escaped')
+        break;
+    
     x = calc_x(t)
     y = calc_y(t)
     
-    #vertex.co = [x,y,0]
-    print("vertex", vertex.co)
+    vertices.append([x,y,0])
+    t += delta;
     
-    t += delta
+    escape += 1;
     
-    ++escape
-    
-    if(escape >= 420):
-        print('escaped')
-        break
-
-print('done')
+print(vertices)
