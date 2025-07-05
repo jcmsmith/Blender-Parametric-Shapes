@@ -1,46 +1,18 @@
 import math
+import mathutils
 import bpy
 import bmesh
-
-print("-------------------------------------------------------------")
-
-
-#Create new object with mesh
-mesh = bpy.data.meshes.new(name="shape");
-shape = bpy.data.objects.new("shape", mesh);
-
-#Select the new object
-bpy.context.collection.objects.link(shape)
-shape.select_set(True)
-
-#Switch to edit mode
-if bpy.context.mode != "EDIT_MESH" and bpy.ops.object.mode_set.poll():
-    bpy.ops.object.mode_set(mode="EDIT");
-
-#Delete all vertices except one    
-bpy.ops.mesh.primitive_cube_add();
-bpy.ops.mesh.select_all(action='DESELECT')
-bpy.ops.mesh.select_random(ratio=0.875)
-bpy.ops.mesh.delete()
-
-#Create bmesh to access vertex data
-obj_data = bpy.context.object.data
-bm = bmesh.from_edit_mesh(obj_data)
-bm.verts.ensure_lookup_table()
-vertex = bm.verts[0]
-
-#Subtract the coordinates of the original point from its current point to move while maintaining offset - probably unnecessary here we're just trying to move it to the origin
-v_coords = vertex.co.copy()
-v_coords -= v_coords
-    
-#Update mesh data
-obj_data.update()
-bm.verts.ensure_lookup_table()
 
 #math constants
 pi = math.pi
 sin = math.sin
 cos = math.cos
+
+period = 2*pi
+
+#Update t based on frame rate
+fps = bpy.context.scene.render.fps
+delta = ((2*pi)/fps)
 
 def calc_x(t):
     return 2 * cos(t) + 3 * sin(4 * t)
@@ -48,18 +20,53 @@ def calc_x(t):
 def calc_y(t):
     return 3 * sin(t) + 2 * cos(4 * t)
 
-#Update t based on render frame rate
-fps = bpy.context.scene.render.fps
-delta = pi/fps
+def calculate_points(period = 2*pi):
+    escape = 0
+    t = 0
+    vertices = []
 
-for t in range(0, 100):
-    x = calc_x(t)
-    y = calc_y(t)
+    while t < period:
+        if(escape >= 420):
+            print('oops, escaped')
+            break;
+        
+        x = calc_x(t)
+        y = calc_y(t)
+        
+        coordinates = mathutils.Vector([x,y,0])
+        
+        vertices.append(coordinates)
+        t += delta;
+        
+        escape += 1;
+        
+    return vertices;
+
+
+print("-------------------------------------------------------------")
+
+#Create object, enter edit mode & delete existing vertices
+shape = bpy.ops.mesh.primitive_cube_add(enter_editmode=True);
+bpy.ops.mesh.select_all(action='SELECT')
+bpy.ops.mesh.delete()
+
+#Create bmesh to access and manipulate vertex properties
+obj_data = bpy.context.object.data
+bm = bmesh.from_edit_mesh(obj_data)
+
+points = calculate_points();
+previous = []
+
+for point in points:
+    newvert = bm.verts.new(point)
     
-    vertex.co = [x,y,0]
-    print("vertex", vertex.co)
+    if previous:
+        bmesh.ops.contextual_create(bm, geom=[newvert, previous])
+        
+    bm.verts.ensure_lookup_table()
+    bm.verts.index_update()
     
-    t += delta
+    previous = newvert;
     
-    if(t >= 2*pi):
-        break
+#Update mesh data
+obj_data.update()
