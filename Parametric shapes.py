@@ -57,7 +57,7 @@ bm.verts.ensure_lookup_table()
 
 points = calculate_points();
 for point in points:
-    print("point", point)
+    newvert = bm.verts.new(point)
     
 #Update mesh data
 obj_data.update()
