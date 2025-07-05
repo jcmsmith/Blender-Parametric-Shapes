@@ -56,8 +56,17 @@ bm = bmesh.from_edit_mesh(obj_data)
 bm.verts.ensure_lookup_table()
 
 points = calculate_points();
+previous = []
+
 for point in points:
     newvert = bm.verts.new(point)
+    
+    if not previous:
+        previous = newvert
+        continue;
+    
+    bmesh.ops.connect_vert_pair(bm, verts=[newvert, previous])
+    previous = newvert;
     
 #Update mesh data
 obj_data.update()
