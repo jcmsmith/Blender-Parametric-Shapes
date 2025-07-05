@@ -1,4 +1,5 @@
 import math
+import mathutils
 import bpy
 import bmesh
 
@@ -32,10 +33,13 @@ def calculate_points(period = 2*pi):
         x = calc_x(t)
         y = calc_y(t)
         
-        vertices.append([x,y,0])
+        coordinates = mathutils.Vector([x,y,0])
+        
+        vertices.append(coordinates)
         t += delta;
         
         escape += 1;
+        
     return vertices;
 
 
